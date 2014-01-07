@@ -1390,6 +1390,14 @@
 								<td></td>
 								<td></td>
 							</tr>
+							<tr>
+								<td><a href="#configs_codes">Codes</a></td>
+								<td>codes/template</td>
+								<td></td>
+								<td><a href="#configs_codes_retrieve_template">Retrieve Code Template</a></td>
+								<td></td>
+								<td></td>
+							</tr>
 							<tr class="alt">
 								<td></td>
 								<td>codes/{codeId}</td>
@@ -10915,6 +10923,39 @@ GET https://DomainName/api/v1/codes
 					</code>
 				</div>
 			</div>
+			<a id="configs_codes_retrieve_template" name="configs_codes_retrieve_template"
+				class="old-syle-anchor">&nbsp;</a>
+			<div class="method-section">
+				<div class="method-description">
+					<h4>Retrieve Code Template</h4>
+					<p>Returns the list of code values.</p>
+					<p>Example Requests:</p>
+					<div class=apiClick>codes/template</div>
+				</div>
+				<div class="method-example">
+					<code class="method-declaration">
+GET https://DomainName/api/v1/codes/template
+					</code>
+					<code class="method-response">
+[{
+	"id": 21,
+	"name": "Reporting",
+	"position": 0
+},
+{
+	"id": 20,
+	"name": "Accounting",
+	"position": 0
+},
+{
+	"id": 19,
+	"name": "Loan Purpose",
+	"position": 0
+}]
+					</code>
+				</div>
+			</div>
+
 
 			<a id="configs_code_retrieve" name="configs_code_retrieve"
 				class="old-syle-anchor">&nbsp;</a>
@@ -23070,6 +23111,14 @@ No Request Body:
 					<td>codes</td>
 					<td><a href="#configs_codes_create">Create a Code</a></td>
 					<td><a href="#configs_codes_retrieve">List Codes</a></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><a href="#configs_codes">Codes</a></td>
+					<td>codes/template</td>
+					<td></td>
+					<td><a href="#configs_codes_retrieve_template">Retrieve Code Template</a></td>
 					<td></td>
 					<td></td>
 				</tr>
