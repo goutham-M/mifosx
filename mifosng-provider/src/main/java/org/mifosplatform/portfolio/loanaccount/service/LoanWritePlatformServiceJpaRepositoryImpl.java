@@ -21,6 +21,8 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.mifosplatform.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.mifosplatform.infrastructure.codes.domain.CodeValue;
+import org.mifosplatform.infrastructure.codes.domain.CodeValueRepository;
 import org.mifosplatform.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.ApiParameterError;
@@ -78,6 +80,9 @@ import org.mifosplatform.portfolio.collectionsheet.command.CollectionSheetBulkRe
 import org.mifosplatform.portfolio.collectionsheet.command.SingleDisbursalCommand;
 import org.mifosplatform.portfolio.collectionsheet.command.SingleRepaymentCommand;
 import org.mifosplatform.portfolio.common.domain.PeriodFrequencyType;
+import org.mifosplatform.portfolio.fund.domain.Fund;
+import org.mifosplatform.portfolio.fund.domain.FundLoanMappingHistory;
+import org.mifosplatform.portfolio.fund.domain.FundLoanMappingHistoryRepository;
 import org.mifosplatform.portfolio.group.domain.Group;
 import org.mifosplatform.portfolio.group.exception.GroupNotActiveException;
 import org.mifosplatform.portfolio.loanaccount.command.LoanUpdateCommand;
@@ -161,6 +166,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     private final LoanReadPlatformService loanReadPlatformService;
     private final FromJsonHelper fromApiJsonHelper;
     private final AccountTransferRepository accountTransferRepository;
+    private final FundLoanMappingHistoryRepository historyRepository;
+    private final CodeValueRepository codeValueRepository;
 
     @Autowired
     public LoanWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
@@ -179,7 +186,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final AccountTransfersReadPlatformService accountTransfersReadPlatformService,
             final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService,
             final LoanChargeReadPlatformService loanChargeReadPlatformService, final LoanReadPlatformService loanReadPlatformService,
-            final FromJsonHelper fromApiJsonHelper, final AccountTransferRepository accountTransferRepository) {
+            final FromJsonHelper fromApiJsonHelper, final AccountTransferRepository accountTransferRepository,
+            final FundLoanMappingHistoryRepository historyRepository, final CodeValueRepository codeValueRepository) {
         this.context = context;
         this.loanEventApiJsonValidator = loanEventApiJsonValidator;
         this.loanAssembler = loanAssembler;
@@ -206,6 +214,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         this.loanReadPlatformService = loanReadPlatformService;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.accountTransferRepository = accountTransferRepository;
+        this.historyRepository = historyRepository;
+        this.codeValueRepository = codeValueRepository;
     }
 
     private LoanLifecycleStateMachine defaultLoanLifecycleStateMachine() {
@@ -305,6 +315,28 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                     PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN, savingAccountData.accountId(), loanId, "Loan Charge Payment",
                     locale, fmt, null, null, LoanTransactionType.REPAYMENT_AT_DISBURSEMENT.getValue(), entrySet.getKey(), null);
             this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+        }
+        
+        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+        if (loan.getFundingDate() != null && loan.getFundingDate().isBefore(actualDisbursementDate)) {
+            final ApiParameterError error = ApiParameterError.parameterError(
+                    "validation.msg.loan.fundingdate.should.not.be.before.actual.disbursement.date",
+                    "The parameter fundingdate cannot be before the actual disbursement date.",
+                    "fundingDate", loan.getFundingDate(), actualDisbursementDate);
+            dataValidationErrors.add(error);
+        }
+        
+        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+        
+        if (loan.getFund() != null) {
+            Fund fund = this.loanAssembler.findFundByIdIfProvided(loan.getFund().getId());
+            CodeValue fundTypeValue = null;     
+            if (loan.getFundTypeValue() != null) {
+                fundTypeValue = this.codeValueRepository.findOne(loan.getFundTypeValue().getId());
+            }
+            FundLoanMappingHistory mappingHistory = FundLoanMappingHistory.createNewInstance(loan, fund, fundTypeValue,
+                    loan.getFundingDate() != null ? loan.getFundingDate().toDate() : actualDisbursementDate.toDate());
+            this.historyRepository.save(mappingHistory);
         }
 
         return new CommandProcessingResultBuilder() //
@@ -512,7 +544,10 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                     existingTransactionIds, existingReversedTransactionIds);
             this.journalEntryWritePlatformService.createJournalEntriesForLoan(accountingBridgeData);
         }
-
+        FundLoanMappingHistory mappingHistoryForExistingFund = this.historyRepository.loanAccountFundMapChanged(loan.getId());
+        if (mappingHistoryForExistingFund != null) {
+            this.historyRepository.delete(mappingHistoryForExistingFund);
+        }
         return new CommandProcessingResultBuilder() //
                 .withCommandId(command.commandId()) //
                 .withEntityId(loan.getId()) //

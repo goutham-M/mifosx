@@ -421,7 +421,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
     private static final class LoanMapper implements RowMapper<LoanAccountData> {
 
         public String loanSchema() {
-            return "l.id as id, l.account_no as accountNo, l.external_id as externalId, l.fund_id as fundId, f.name as fundName,"
+            return "l.id as id, l.account_no as accountNo, l.external_id as externalId, l.fund_id as fundId, l.fund_type_cv_id as fundTypeId, l.funding_date as fundingDate, f.name as fundName,"
                     + " l.loan_type_enum as loanType, l.loanpurpose_cv_id as loanPurposeId, cv.code_value as loanPurposeName,"
                     + " lp.id as loanProductId, lp.name as loanProductName, lp.description as loanProductDescription,"
                     + " lp.allow_multiple_disbursals as multiDisburseLoan, lp.purpose_category_code_id as codeId, "
@@ -537,7 +537,10 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
             final Long fundId = JdbcSupport.getLong(rs, "fundId");
             final String fundName = rs.getString("fundName");
-
+            
+            final Long fundTypeId = JdbcSupport.getLong(rs, "fundTypeId");
+            final LocalDate fundingDate = JdbcSupport.getLocalDate(rs, "fundingDate");
+            
             final Long loanOfficerId = JdbcSupport.getLong(rs, "loanOfficerId");
             final String loanOfficerName = rs.getString("loanOfficerName");
 
@@ -717,7 +720,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     annualInterestRate, interestType, interestCalculationPeriodType, expectedFirstRepaymentOnDate, graceOnPrincipalPayment,
                     graceOnInterestPayment, graceOnInterestCharged, interestChargedFromDate, timeline, loanSummary,
                     feeChargesDueAtDisbursementCharged, syncDisbursementWithMeeting, loanCounter, loanProductCounter, multiDisburseLoan,
-                    fixedEmiAmount, outstandingLoanBalance, inArrears, graceOnArrearsAgeing, codeId);
+                    fixedEmiAmount, outstandingLoanBalance, inArrears, graceOnArrearsAgeing, codeId, fundTypeId, fundingDate);
         }
     }
 
