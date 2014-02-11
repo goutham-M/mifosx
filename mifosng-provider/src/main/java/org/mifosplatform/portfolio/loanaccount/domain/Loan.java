@@ -3739,5 +3739,9 @@ public class Loan extends AbstractPersistable<Long> {
         }
         return emiAmount;
     }
+    
+    public Fund getFund() {
+        return this.fund;
+    }
 
 }

@@ -748,7 +748,6 @@ public final class LoanApplicationCommandFromApiJsonHelper {
                 "Validation errors exist.", dataValidationErrors); }
     }
     
-    
     private void validateLoanMultiDisbursementdate(final JsonElement element, final DataValidatorBuilder baseDataValidator,LocalDate expectedDisbursement,
             BigDecimal totalPrincipal){
         final JsonObject topLevelJsonElement = element.getAsJsonObject();
@@ -794,10 +793,35 @@ public final class LoanApplicationCommandFromApiJsonHelper {
                 final Integer interestType = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(interestTypeParameterName, element);
                 baseDataValidator.reset().parameter(interestTypeParameterName).value(interestType).ignoreIfNull().integerSameAsNumber(InterestMethod.DECLINING_BALANCE.getValue());
             }
-            
         }
+            
+    }
 
         
+    public void validateForFundMapping(final String json) {
+        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+
+        final Set<String> undoSupportedParameters = new HashSet<String>(Arrays.asList("fundId", "loanIdArray"));
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, undoSupportedParameters);
+
+        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan");
+        final JsonElement element = this.fromApiJsonHelper.parse(json);
+
+        final String fundIdParam = "fundId";
+        if (this.fromApiJsonHelper.parameterExists(fundIdParam, element)) {
+            final Long fundId = this.fromApiJsonHelper.extractLongNamed(fundIdParam, element);
+            baseDataValidator.reset().parameter(fundIdParam).value(fundId).notNull();
+        }
+        
+        final String loanIdArrayParam = "loanIdArray";
+        if (this.fromApiJsonHelper.parameterExists(loanIdArrayParam, element)) {
+            final String[] loanIdArray = this.fromApiJsonHelper.extractArrayNamed(loanIdArrayParam, element);
+            baseDataValidator.reset().parameter(loanIdArrayParam).value(loanIdArray).arrayNotEmpty();
+        }
+
+        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
     }
 
 }

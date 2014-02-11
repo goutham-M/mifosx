@@ -639,6 +639,14 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    public CommandWrapperBuilder updateLoanApplicationForFundMapping() {
+        this.actionName = "UPDATE";
+        this.entityName = "LOAN";
+        this.entityId = null;
+        this.loanId = null;
+        this.href = "/loans";
+        return this;
+    }
 
     public CommandWrapperBuilder deleteLoanApplication(final Long loanId) {
         this.actionName = "DELETE";
