@@ -131,7 +131,15 @@ public class Loan extends AbstractPersistable<Long> {
     @ManyToOne(optional = true)
     @JoinColumn(name = "fund_id", nullable = true)
     private Fund fund;
-
+    
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "fund_type_cv_id", nullable = true)
+    private CodeValue fundTypeCodeValue;
+    
+    @Temporal(TemporalType.DATE)
+    @Column(name = "funding_date")
+    private Date fundingDate;
+    
     @ManyToOne
     @JoinColumn(name = "loan_officer_id", nullable = true)
     private Staff loanOfficer;
@@ -311,13 +319,13 @@ public class Loan extends AbstractPersistable<Long> {
             final LoanTransactionProcessingStrategy transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges,
             final Set<LoanCollateral> collateral, final BigDecimal fixedEmiAmount, final Set<LoanDisbursementDetails> disbursementDetails,
-            final BigDecimal maxOutstandingLoanBalance) {
+            final BigDecimal maxOutstandingLoanBalance, final CodeValue fundTypeCodeValue, final LocalDate fundingDate) {
         final LoanStatus status = null;
         final Group group = null;
         final Boolean syncDisbursementWithMeeting = null;
         return new Loan(accountNo, client, group, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct,
                 loanRepaymentScheduleDetail, status, loanCharges, collateral, syncDisbursementWithMeeting, fixedEmiAmount,
-                disbursementDetails,maxOutstandingLoanBalance);
+                disbursementDetails, maxOutstandingLoanBalance, fundTypeCodeValue, fundingDate);
     }
 
     public static Loan newGroupLoanApplication(final String accountNo, final Group group, final Integer loanType,
@@ -325,14 +333,15 @@ public class Loan extends AbstractPersistable<Long> {
             final LoanTransactionProcessingStrategy transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
-            final Set<LoanDisbursementDetails> disbursementDetails,final BigDecimal maxOutstandingLoanBalance) {
+            final Set<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
+            final CodeValue fundTypeCodeValue, final LocalDate fundingDate) {
         final LoanStatus status = null;
         final CodeValue loanPurpose = null;
         final Set<LoanCollateral> collateral = null;
         final Client client = null;
         return new Loan(accountNo, client, group, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct,
                 loanRepaymentScheduleDetail, status, loanCharges, collateral, syncDisbursementWithMeeting, fixedEmiAmount,
-                disbursementDetails,maxOutstandingLoanBalance);
+                disbursementDetails,maxOutstandingLoanBalance, fundTypeCodeValue, fundingDate);
     }
 
     public static Loan newIndividualLoanApplicationFromGroup(final String accountNo, final Client client, final Group group,
@@ -340,13 +349,14 @@ public class Loan extends AbstractPersistable<Long> {
             final LoanTransactionProcessingStrategy transactionProcessingStrategy,
             final LoanProductRelatedDetail loanRepaymentScheduleDetail, final Set<LoanCharge> loanCharges,
             final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
-            final Set<LoanDisbursementDetails> disbursementDetails,final BigDecimal maxOutstandingLoanBalance) {
+            final Set<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
+            final CodeValue fundTypeCodeValue, final LocalDate fundingDate) {
         final LoanStatus status = null;
         final CodeValue loanPurpose = null;
         final Set<LoanCollateral> collateral = null;
         return new Loan(accountNo, client, group, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct,
                 loanRepaymentScheduleDetail, status, loanCharges, collateral, syncDisbursementWithMeeting, fixedEmiAmount,
-                disbursementDetails,maxOutstandingLoanBalance);
+                disbursementDetails,maxOutstandingLoanBalance, fundTypeCodeValue, fundingDate);
     }
 
     protected Loan() {
@@ -358,7 +368,7 @@ public class Loan extends AbstractPersistable<Long> {
             final LoanProduct loanProduct, final LoanProductRelatedDetail loanRepaymentScheduleDetail, final LoanStatus loanStatus,
             final Set<LoanCharge> loanCharges, final Set<LoanCollateral> collateral, final Boolean syncDisbursementWithMeeting,
             final BigDecimal fixedEmiAmount, final Set<LoanDisbursementDetails> disbursementDetails,
-            final BigDecimal maxOutstandingLoanBalance) {
+            final BigDecimal maxOutstandingLoanBalance, final CodeValue fundTypeCodeValue, final LocalDate fundingDate) {
 
         this.loanRepaymentScheduleDetail = loanRepaymentScheduleDetail;
         this.loanRepaymentScheduleDetail.validateRepaymentPeriodWithGraceSettings();
@@ -375,6 +385,12 @@ public class Loan extends AbstractPersistable<Long> {
         this.fund = fund;
         this.loanOfficer = loanOfficer;
         this.loanPurpose = loanPurpose;
+        this.fundTypeCodeValue = fundTypeCodeValue;
+        if (fundingDate != null) {
+        	this.fundingDate = fundingDate.toDate();
+        } else {
+        	this.fundingDate = null;
+        }
 
         this.transactionProcessingStrategy = transactionProcessingStrategy;
         this.loanProduct = loanProduct;
@@ -1064,7 +1080,28 @@ public class Loan extends AbstractPersistable<Long> {
             final Long newValue = command.longValueOfParameterNamed(fundIdParamName);
             actualChanges.put(fundIdParamName, newValue);
         }
+        
+        Long existingFundTypeId = null;
+        if (this.fundTypeCodeValue != null) {
+        	existingFundTypeId = this.fundTypeCodeValue.getId();
+        }
+        final String fundTypeIdParamName = "fundTypeId";
+        if (command.isChangeInLongParameterNamed(fundTypeIdParamName, existingFundTypeId)) {
+            final Long newValue = command.longValueOfParameterNamed(fundTypeIdParamName);
+            actualChanges.put(fundTypeIdParamName, newValue);
+        }
+        
+        final String fundingDateParamName = "fundingDate";
+        if (command.isChangeInLocalDateParameterNamed(fundingDateParamName, getFundingDate())) {
+            final String valueAsInput = command.stringValueOfParameterNamed(fundingDateParamName);
+            actualChanges.put(fundingDateParamName, valueAsInput);
+            actualChanges.put("dateFormat", dateFormatAsInput);
+            actualChanges.put("locale", localeAsInput);
 
+            final LocalDate newValue = command.localDateValueOfParameterNamed(fundingDateParamName);
+            this.fundingDate = newValue.toDate();
+        }
+        
         Long existingLoanOfficerId = null;
         if (this.loanOfficer != null) {
             existingLoanOfficerId = this.loanOfficer.getId();
@@ -3742,6 +3779,27 @@ public class Loan extends AbstractPersistable<Long> {
     
     public Fund getFund() {
         return this.fund;
+    }
+    
+    public CodeValue getFundTypeValue() {
+    	return this.fundTypeCodeValue;
+    }
+    
+    public LocalDate getFundingDate() {
+        return (LocalDate) ObjectUtils.defaultIfNull(new LocalDate(this.fundingDate), null);
+    }
+
+    public void updateFundTypeValue(final CodeValue fundTypeCodeValue) {
+        this.fundTypeCodeValue = fundTypeCodeValue;
+    }
+
+    public void updateFundingDate(LocalDate fundingDate) {
+        if (fundingDate != null) {
+            this.fundingDate = fundingDate.toDate();
+        } else {
+            this.fundingDate = null;
+        }
+
     }
 
 }

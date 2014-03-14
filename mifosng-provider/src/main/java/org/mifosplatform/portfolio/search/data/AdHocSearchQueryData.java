@@ -24,16 +24,20 @@ public class AdHocSearchQueryData {
     @SuppressWarnings("unused")
     private final BigDecimal disburseAmount;
     @SuppressWarnings("unused")
-	private final LocalDate disbursementDate;
+    private final LocalDate disbursementDate;
     @SuppressWarnings("unused")
     private final Double percentage;
     @SuppressWarnings("unused")
     private final Integer loanId;
-    
+
     @SuppressWarnings("unused")
     private final Collection<LoanProductData> loanProducts;
     @SuppressWarnings("unused")
     private final Collection<OfficeData> offices;
+    @SuppressWarnings("unused")
+    private final String accountNo;
+    @SuppressWarnings("unused")
+    private final String fundType;
 
     public static AdHocSearchQueryData template(final Collection<LoanProductData> loanProducts, final Collection<OfficeData> offices) {
         final String officeName = null;
@@ -41,25 +45,26 @@ public class AdHocSearchQueryData {
         final Integer count = null;
         final BigDecimal loanOutStanding = null;
         final Double percentage = null;
-        return new AdHocSearchQueryData(null, officeName, loanProductName, null, count, null, null, loanOutStanding, percentage, null, loanProducts, offices);
+        return new AdHocSearchQueryData(null, officeName, loanProductName, null, count, null, null, loanOutStanding, percentage, null,
+                loanProducts, offices, null, null);
     }
 
-    public static AdHocSearchQueryData matchedResult(final String clientName, final String officeName, final String loanProductName, 
-    		final String fundName, final Integer count, final BigDecimal disburseAmount, final LocalDate disbursementDate, 
-    		final BigDecimal loanOutStanding, final Double percentage, final Integer loanId) {
+    public static AdHocSearchQueryData matchedResult(final String clientName, final String officeName, final String loanProductName,
+            final String fundName, final Integer count, final BigDecimal disburseAmount, final LocalDate disbursementDate,
+            final BigDecimal loanOutStanding, final Double percentage, final Integer loanId, final String accountNo, final String fundType) {
 
         final Collection<LoanProductData> loanProducts = null;
         final Collection<OfficeData> offices = null;
         return new AdHocSearchQueryData(clientName, officeName, loanProductName, fundName, count, disburseAmount, disbursementDate,
-        		loanOutStanding, percentage, loanId, loanProducts, offices);
+                loanOutStanding, percentage, loanId, loanProducts, offices, accountNo, fundType);
     }
 
-    private AdHocSearchQueryData(final String clientName, final String officeName, final String loanProductName, 
-    		final String fundName, final Integer count, final BigDecimal disburseAmount, final LocalDate disbursementDate, 
-    		final BigDecimal loanOutStanding, final Double percentage, final Integer loanId, final Collection<LoanProductData> loanProducts,
-            final Collection<OfficeData> offices) {
-    	
-    	this.clientName = clientName;
+    private AdHocSearchQueryData(final String clientName, final String officeName, final String loanProductName, final String fundName,
+            final Integer count, final BigDecimal disburseAmount, final LocalDate disbursementDate, final BigDecimal loanOutStanding,
+            final Double percentage, final Integer loanId, final Collection<LoanProductData> loanProducts,
+            final Collection<OfficeData> offices, final String accountNo, final String fundType) {
+
+        this.clientName = clientName;
         this.officeName = officeName;
         this.loanProductName = loanProductName;
         this.fundName = fundName;
@@ -71,5 +76,7 @@ public class AdHocSearchQueryData {
         this.loanId = loanId;
         this.loanProducts = loanProducts;
         this.offices = offices;
+        this.accountNo = accountNo;
+        this.fundType = fundType;
     }
 }

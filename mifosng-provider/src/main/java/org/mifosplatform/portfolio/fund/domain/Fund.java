@@ -18,7 +18,7 @@ import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
-@Table(name = "m_fund", uniqueConstraints = { @UniqueConstraint(columnNames = { "name", "fund_type_cv_id" }, name = "fund_name_org"),
+@Table(name = "m_fund", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "fund_name_org"),
         @UniqueConstraint(columnNames = { "external_id" }, name = "fund_externalid_org") })
 public class Fund extends AbstractPersistable<Long> {
 
@@ -28,9 +28,6 @@ public class Fund extends AbstractPersistable<Long> {
     @Column(name = "external_id", length = 100)
     private String externalId;
     
-    @Column(name = "fund_type_cv_id")
-    private Long fundTypeId;
-    
     public static Fund fromJson(final JsonCommand command) {
 
         final String firstnameParamName = "name";
@@ -38,21 +35,17 @@ public class Fund extends AbstractPersistable<Long> {
 
         final String lastnameParamName = "externalId";
         final String externalId = command.stringValueOfParameterNamed(lastnameParamName);
-        
-        final String fundTypeIdParamName = "fundTypeId";
-        final Long fundTypeId = command.longValueOfParameterNamed(fundTypeIdParamName);
 
-        return new Fund(name, externalId, fundTypeId);
+        return new Fund(name, externalId);
     }
 
     protected Fund() {
         //
     }
 
-    private Fund(final String fundName, final String externalId, final Long fundTypeId) {
+    private Fund(final String fundName, final String externalId) {
         this.name = StringUtils.defaultIfEmpty(fundName, null);
         this.externalId = StringUtils.defaultIfEmpty(externalId, null);
-        this.fundTypeId = fundTypeId;
     }
 
     public Map<String, Object> update(final JsonCommand command) {
@@ -73,18 +66,6 @@ public class Fund extends AbstractPersistable<Long> {
             this.externalId = StringUtils.defaultIfEmpty(newValue, null);
         }
         
-        final String fundTypeIdParamName = "fundTypeId";
-        if (command.isChangeInLongParameterNamed(fundTypeIdParamName, this.fundTypeId)) {
-        	final Long newValue = command.longValueOfParameterNamed(fundTypeIdParamName);
-            actualChanges.put(fundTypeIdParamName, newValue);
-            this.fundTypeId = newValue;
-        }
-
         return actualChanges;
-    }
-    
-		
-    public Long getFundTypeId() {
-        return fundTypeId;
     }
 }

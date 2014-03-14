@@ -162,7 +162,7 @@ public class SearchReadPlatformServiceImpl implements SearchReadPlatformService 
             final String entityType = rs.getString("entityType");
             final Long parentId = JdbcSupport.getLong(rs, "parentId");
             final String parentName = rs.getString("parentName");
-            return new SearchData(entityId, entityAccountNo, entityExternalId, entityName, entityType, parentId, parentName);
+            return new SearchData(entityId, entityAccountNo, entityExternalId, entityName, entityType, parentId, parentName, null, null);
         }
 
     }
@@ -220,13 +220,14 @@ public class SearchReadPlatformServiceImpl implements SearchReadPlatformService 
             final StringBuilder sql = new StringBuilder();
             final String queryType = "details";
             sql.append(
-                    "a.display_name as clientName, a.name as officeName, a.productName, a.fundName, a.loanId, a.disburseAmt, a.disburseOnDate, ")
-                    .append("a.outstandingAmt as outstanding, a.percentOut as percentOut from (select mc.display_name, mo.name, mp.name as productName, ml.id as loanId, ")
+                    "a.display_name as clientName, a.name as officeName, a.productName, a.fundName, a.loanId, a.accountNo, a.fundType, a.disburseAmt, a.disburseOnDate, ")
+                    .append("a.outstandingAmt as outstanding, a.percentOut as percentOut from (select mc.display_name, mo.name, mp.name as productName, ")
+                    .append("ml.id as loanId, ml.account_no as accountNo, mcv.code_value as fundType, ")
                     .append("mf.name as fundName, (ifnull(ml.principal_disbursed_derived,0.0)) disburseAmt, ml.disbursedon_date as disburseOnDate, ")
                     .append("(ifnull(ml.total_outstanding_derived,0.0)) outstandingAmt,  ")
                     .append("((ifnull(ml.total_outstanding_derived,0.0)) * 100 / (ifnull(ml.principal_disbursed_derived,0.0))) percentOut ")
                     .append("from m_loan ml inner join m_product_loan mp on mp.id=ml.product_id  inner join m_client mc on  ")
-                    .append("mc.id=ml.client_id join m_fund mf on mf.id=ml.fund_id inner join m_office mo on mo.id=mc.office_id  ");
+                    .append("mc.id=ml.client_id left join m_fund mf on mf.id=ml.fund_id left join m_code_value mcv on mcv.id = ml.fund_type_cv_id inner join m_office mo on mo.id=mc.office_id  ");
             return addConditions(sql, searchConditions, params, queryType);
         }
         //TODO- build the query dynamically based on selected entity types, for now adding query for only loan entity.
@@ -340,6 +341,7 @@ public class SearchReadPlatformServiceImpl implements SearchReadPlatformService 
             }
         }
 
+        @SuppressWarnings("null")
         @Override
         public AdHocSearchQueryData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
             List<String> columnNames = new ArrayList<String>();
@@ -357,6 +359,9 @@ public class SearchReadPlatformServiceImpl implements SearchReadPlatformService 
             BigDecimal disburseAmount = null;
             LocalDate disburseOnDate = null;
             Integer loanId = null;
+            String accountNo = null;
+            String fundType = null;
+            
             if (columnNames.contains("clientName")) {
                 clientName = rs.getString("clientName");
             }
@@ -376,6 +381,14 @@ public class SearchReadPlatformServiceImpl implements SearchReadPlatformService 
             if (columnNames.contains("loanId")) {
                 loanId = JdbcSupport.getInteger(rs, "loanId");
             }
+            
+            if (columnNames.contains("accountNo")) {
+            	accountNo = rs.getString("accountNo");
+            }
+            
+            if (columnNames.contains("fundType")) {
+            	fundType = rs.getString("fundType");
+            }
 
             final String officeName = rs.getString("officeName");
             final String loanProductName = rs.getString("productName");
@@ -394,7 +407,7 @@ public class SearchReadPlatformServiceImpl implements SearchReadPlatformService 
             final Double percentage = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "percentOut").setScale(2, RoundingMode.HALF_UP)
                     .doubleValue();
             return AdHocSearchQueryData.matchedResult(clientName, officeName, loanProductName, fundName, count, disburseAmount,
-                    disburseOnDate, loanOutStanding, percentage, loanId);
+                    disburseOnDate, loanOutStanding, percentage, loanId, accountNo, fundType);
         }
         
     }

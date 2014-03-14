@@ -9,19 +9,22 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 
 import org.mifosplatform.infrastructure.codes.domain.CodeValue;
 import org.mifosplatform.portfolio.loanaccount.domain.Loan;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
-@Table(name = "m_fund_mapping_history", uniqueConstraints = { @UniqueConstraint(columnNames = { "loan_id", "fund_type_cv_id" }, name = "fund_loan_id_fundtype") })
-public class FundMappingHistory extends AbstractPersistable<Long> {
+@Table(name = "m_fund_loan_mapping_history")
+public class FundLoanMappingHistory extends AbstractPersistable<Long> {
 
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
+    
+    @ManyToOne
+    @JoinColumn(name = "fund_id", nullable = false)
+    private Fund fund;
 
     @ManyToOne
     @JoinColumn(name = "fund_type_cv_id", nullable = false)
@@ -35,30 +38,20 @@ public class FundMappingHistory extends AbstractPersistable<Long> {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    @Column(name = "create_date", nullable = true)
-    @Temporal(TemporalType.DATE)
-    private Date createDate;
-
-    @Column(name = "update_date", nullable = true)
-    @Temporal(TemporalType.DATE)
-    private Date updateDate;
-
-    public static FundMappingHistory createNewInstance(final Loan loan, final CodeValue fundTypeCodeValue) {
-        return new FundMappingHistory(loan, fundTypeCodeValue, loan.getSubmittedOnDate().toDate(), null, null, null);
+    public static FundLoanMappingHistory createNewInstance(final Loan loan, final Fund fund, final CodeValue fundTypeCodeValue) {
+        return new FundLoanMappingHistory(loan, fund, fundTypeCodeValue, loan.getSubmittedOnDate().toDate(), null);
     }
 
-    protected FundMappingHistory() {
+    protected FundLoanMappingHistory() {
         //
     }
 
-    private FundMappingHistory(final Loan loan, final CodeValue fundTypeCodeValue, final Date startDate, final Date endDate,
-            final Date createDate, final Date updateDate) {
+    private FundLoanMappingHistory(final Loan loan, final Fund fund, final CodeValue fundTypeCodeValue, final Date startDate, final Date endDate) {
         this.loan = loan;
         this.fundTypeCodeValue = fundTypeCodeValue;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.createDate = createDate;
-        this.updateDate = updateDate;
+        this.fund = fund;
 
     }
 

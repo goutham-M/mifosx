@@ -69,16 +69,11 @@ public class FundsApiResource {
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveFunds(@Context final UriInfo uriInfo, @QueryParam("fundTypeId") final Long fundTypeId) {
+    public String retrieveFunds(@Context final UriInfo uriInfo) {
 
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
-        Collection<FundData> funds = null;
-        if (fundTypeId != null) {
-        	funds = this.readPlatformService.retrieveAllFundsByFundType(fundTypeId);
-        } else {
-        	funds = this.readPlatformService.retrieveAllFunds();
-        }
-
+        
+        final Collection<FundData> funds = this.readPlatformService.retrieveAllFunds();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, funds, this.RESPONSE_DATA_PARAMETERS);
     }

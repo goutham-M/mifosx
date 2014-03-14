@@ -153,11 +153,16 @@ public class LoanAssembler {
         final Long transactionProcessingStrategyId = this.fromApiJsonHelper.extractLongNamed("transactionProcessingStrategyId", element);
         final Long loanPurposeId = this.fromApiJsonHelper.extractLongNamed("loanPurposeId", element);
         final Boolean syncDisbursementWithMeeting = this.fromApiJsonHelper.extractBooleanNamed("syncDisbursementWithMeeting", element);
-
+        final Long fundTypeId = this.fromApiJsonHelper.extractLongNamed("fundTypeId", element);
+        LocalDate fundingDate = this.fromApiJsonHelper.extractLocalDateNamed("fundingDate", element);
         final LoanProduct loanProduct = this.loanProductRepository.findOne(productId);
         if (loanProduct == null) { throw new LoanProductNotFoundException(productId); }
 
         final Fund fund = findFundByIdIfProvided(fundId);
+        final CodeValue fundTypeCodeValue = findCodeValueByIdIfProvided(fundTypeId);
+        if (fundTypeCodeValue != null && fundingDate == null) {
+        	fundingDate = new LocalDate();
+        }
         final Staff loanOfficer = findLoanOfficerByIdIfProvided(loanOfficerId);
         final LoanTransactionProcessingStrategy loanTransactionProcessingStrategy = findStrategyByIdIfProvided(transactionProcessingStrategyId);
         CodeValue loanPurpose = null;
@@ -215,7 +220,7 @@ public class LoanAssembler {
 
             loanApplication = Loan.newIndividualLoanApplication(accountNo, client, loanType.getId().intValue(), loanProduct, fund,
                     loanOfficer, loanPurpose, loanTransactionProcessingStrategy, loanProductRelatedDetail, loanCharges, collateral, 
-                    fixedEmiAmount, disbursementDetails,maxOutstandingLoanBalance);
+                    fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance, fundTypeCodeValue, fundingDate);
         }
 
         if (groupId != null) {
@@ -225,7 +230,7 @@ public class LoanAssembler {
 
             loanApplication = Loan.newGroupLoanApplication(accountNo, group, loanType.getId().intValue(), loanProduct, fund, loanOfficer,
                     loanTransactionProcessingStrategy, loanProductRelatedDetail, loanCharges, syncDisbursementWithMeeting, fixedEmiAmount, 
-                    disbursementDetails, maxOutstandingLoanBalance);
+                    disbursementDetails, maxOutstandingLoanBalance, fundTypeCodeValue, fundingDate);
         }
 
         if (client != null && group != null) {
@@ -234,7 +239,7 @@ public class LoanAssembler {
 
             loanApplication = Loan.newIndividualLoanApplicationFromGroup(accountNo, client, group, loanType.getId().intValue(),
                     loanProduct, fund, loanOfficer, loanTransactionProcessingStrategy, loanProductRelatedDetail, loanCharges,
-                    syncDisbursementWithMeeting, fixedEmiAmount, disbursementDetails,maxOutstandingLoanBalance);
+                    syncDisbursementWithMeeting, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance, fundTypeCodeValue, fundingDate);
         }
         
         final String externalId = this.fromApiJsonHelper.extractStringNamed("externalId", element);

@@ -31,7 +31,7 @@ public final class FundCommandFromApiJsonDeserializer {
     /**
      * The parameters supported for this command.
      */
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("name", "externalId", "fundTypeId"));
+    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("name", "externalId"));
 
     private final FromJsonHelper fromApiJsonHelper;
 

@@ -35,7 +35,7 @@ public class FundReadPlatformServiceImpl implements FundReadPlatformService {
     private static final class FundMapper implements RowMapper<FundData> {
 
         public String schema() {
-            return " f.id as id, f.name as name, f.external_id as externalId, f.fund_type_cv_id as fundTypeId from m_fund f ";
+        	return " f.id as id, f.name as name, f.external_id as externalId from m_fund f ";
         }
 
         @Override
@@ -44,9 +44,8 @@ public class FundReadPlatformServiceImpl implements FundReadPlatformService {
             final Long id = rs.getLong("id");
             final String name = rs.getString("name");
             final String externalId = rs.getString("externalId");
-            final Long fundTypeId = rs.getLong("fundTypeId");
-            return FundData.instance(id, name, externalId, fundTypeId);
 
+            return FundData.instance(id, name, externalId);	
         }
     }
 
@@ -77,15 +76,5 @@ public class FundReadPlatformServiceImpl implements FundReadPlatformService {
         } catch (final EmptyResultDataAccessException e) {
             throw new FundNotFoundException(fundId);
         }
-    }
-
-    @Override
-    public Collection<FundData> retrieveAllFundsByFundType(final Long fundTypeId) {
-        this.context.authenticatedUser();
-
-        final FundMapper rm = new FundMapper();
-        final String sql = "select " + rm.schema() + " where f.fund_type_cv_id=?";
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { fundTypeId });
     }
 }
