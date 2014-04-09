@@ -64,6 +64,7 @@ public class LoanAccountData {
     private final String loanProductName;
     private final String loanProductDescription;
     private final Long fundId;
+    private final Long codeId;
     private final String fundName;
     private final Long loanPurposeId;
     private final String loanPurposeName;
@@ -178,6 +179,7 @@ public class LoanAccountData {
         final String loanProductName = null;
         final String loanProductDescription = null;
         final Long fundId = null;
+        final Long codeId = null;
         final String fundName = null;
         final Long loanPurposeId = null;
         final String loanPurposeName = null;
@@ -258,7 +260,7 @@ public class LoanAccountData {
                 chargeTemplate, loanOfficerOptions, loanPurposeOptions, loanCollateralOptions, calendarOptions,
                 syncDisbursementWithMeeting, loancounter, loanProductCounter, notes, accountLinkingOptions, linkedAccount,
                 disbursementData, multiDisburseLoan, fixedEmiAmount, maxOutstandingLoanBalance, emiAmountVariations, memberVariations,
-                product, inArrears, graceOnArrearsAgeing, overdueCharges);
+                product, inArrears, graceOnArrearsAgeing, overdueCharges, codeId);
     }
 
     /**
@@ -278,6 +280,7 @@ public class LoanAccountData {
         final String loanProductName = null;
         final String loanProductDescription = null;
         final Long fundId = null;
+        final Long codeId = null;
         final String fundName = null;
         final Long loanPurposeId = null;
         final String loanPurposeName = null;
@@ -359,7 +362,8 @@ public class LoanAccountData {
                 interestTypeOptions, interestCalculationPeriodTypeOptions, fundOptions, chargeOptions, chargeTemplate, loanOfficerOptions,
                 loanPurposeOptions, loanCollateralOptions, calendarOptions, syncDisbursementWithMeeting, loancounter, loanProductCounter,
                 notes, accountLinkingOptions, linkedAccount, disbursementData, multiDisburseLoan, fixedEmiAmount,
-                maxOutstandingLoanBalance, emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges);
+                maxOutstandingLoanBalance, emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges,
+                codeId);
     }
 
     public static LoanAccountData populateClientDefaults(final LoanAccountData acc, final LoanAccountData clientAcc) {
@@ -380,7 +384,8 @@ public class LoanAccountData {
                 acc.loanOfficerOptions, acc.loanPurposeOptions, acc.loanCollateralOptions, acc.calendarOptions,
                 acc.syncDisbursementWithMeeting, acc.loanCounter, acc.loanProductCounter, acc.notes, acc.accountLinkingOptions,
                 acc.linkedAccount, acc.disbursementDetails, acc.multiDisburseLoan, acc.fixedEmiAmount, acc.maxOutstandingLoanBalance,
-                acc.emiAmountVariations, acc.memberVariations, acc.product, acc.inArrears, acc.graceOnArrearsAgeing, acc.overdueCharges);
+                acc.emiAmountVariations, acc.memberVariations, acc.product, acc.inArrears, acc.graceOnArrearsAgeing, acc.overdueCharges,
+                acc.codeId);
     }
 
     /**
@@ -401,6 +406,7 @@ public class LoanAccountData {
         final String loanProductName = null;
         final String loanProductDescription = null;
         final Long fundId = null;
+        final Long codeId = null;
         final String fundName = null;
         final Long loanPurposeId = null;
         final String loanPurposeName = null;
@@ -482,7 +488,7 @@ public class LoanAccountData {
                 interestTypeOptions, interestCalculationPeriodTypeOptions, fundOptions, chargeOptions, chargeTemplate, loanOfficerOptions,
                 loanPurposeOptions, loanCollateralOptions, calendarOptions, syncDisbursementWithMeeting, loancounter, loanProductCounter,
                 notes, accountLinkingOptions, linkedAccount, disbursementData, multiDisburseLoan, fixedEmiAmount, maxOutstandingBalance,
-                emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges);
+                emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges, codeId);
     }
 
     public static LoanAccountData populateGroupDefaults(final LoanAccountData acc, final LoanAccountData groupAcc) {
@@ -502,7 +508,8 @@ public class LoanAccountData {
                 acc.chargeOptions, null, acc.loanOfficerOptions, acc.loanPurposeOptions, acc.loanCollateralOptions, acc.calendarOptions,
                 acc.syncDisbursementWithMeeting, acc.loanCounter, acc.loanProductCounter, acc.notes, acc.accountLinkingOptions,
                 acc.linkedAccount, acc.disbursementDetails, acc.multiDisburseLoan, acc.fixedEmiAmount, acc.maxOutstandingLoanBalance,
-                acc.emiAmountVariations, acc.memberVariations, acc.product, acc.inArrears, acc.graceOnArrearsAgeing, acc.overdueCharges);
+                acc.emiAmountVariations, acc.memberVariations, acc.product, acc.inArrears, acc.graceOnArrearsAgeing, acc.overdueCharges,
+                acc.codeId);
     }
 
     public static LoanAccountData loanProductWithTemplateDefaults(final LoanProductData product,
@@ -525,6 +532,7 @@ public class LoanAccountData {
         final EnumOptionData loanType = null;
         final String groupName = null;
         final Long fundId = null;
+        final Long codeId = null;
         final String fundName = null;
         final Long loanPurposeId = null;
         final String loanPurposeName = null;
@@ -625,7 +633,7 @@ public class LoanAccountData {
                 loanPurposeOptions, loanCollateralOptions, calendarOptions, syncDisbursementWithMeeting, loancounter, loanProductCounter,
                 notes, accountLinkingOptions, linkedAccount, disbursementData, product.getMultiDisburseLoan(), fixedEmi,
                 product.getOutstandingLoanBalance(), emiAmountVariations, memberVariations, product, inArrears,
-                product.getGraceOnArrearsAgeing(), product.overdueFeeCharges());
+                product.getGraceOnArrearsAgeing(), product.overdueFeeCharges(), product.getCodeId());
     }
 
     public static LoanAccountData populateLoanProductDefaults(final LoanAccountData acc, final LoanProductData product) {
@@ -677,7 +685,7 @@ public class LoanAccountData {
                 acc.syncDisbursementWithMeeting, acc.loanCounter, acc.loanProductCounter, notes, acc.accountLinkingOptions,
                 acc.linkedAccount, acc.disbursementDetails, product.getMultiDisburseLoan(), acc.fixedEmiAmount,
                 product.getOutstandingLoanBalance(), acc.emiAmountVariations, acc.memberVariations, product, acc.inArrears,
-                product.getGraceOnArrearsAgeing(), product.overdueFeeCharges());
+                product.getGraceOnArrearsAgeing(), product.overdueFeeCharges(), product.getCodeId());
     }
 
     /*
@@ -699,7 +707,7 @@ public class LoanAccountData {
             final LoanSummaryData loanSummary, final BigDecimal feeChargesDueAtDisbursementCharged,
             final Boolean syncDisbursementWithMeeting, final Integer loancounter, final Integer loanProductCounter,
             final Boolean multiDisburseLoan, final BigDecimal fixedEmiAmont, final BigDecimal outstandingLoanBalance,
-            final Boolean inArrears, final Integer graceOnArrearsAgeing) {
+            final Boolean inArrears, final Integer graceOnArrearsAgeing, final Long codeId) {
 
         final LoanScheduleData repaymentSchedule = null;
         final Collection<LoanTransactionData> transactions = null;
@@ -743,7 +751,7 @@ public class LoanAccountData {
                 interestTypeOptions, interestCalculationPeriodTypeOptions, fundOptions, chargeOptions, chargeTemplate, loanOfficerOptions,
                 loanPurposeOptions, loanCollateralOptions, calendarOptions, syncDisbursementWithMeeting, loancounter, loanProductCounter,
                 notes, accountLinkingOptions, linkedAccount, disbursementData, multiDisburseLoan, fixedEmiAmont, outstandingLoanBalance,
-                emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges);
+                emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges, codeId);
     }
 
     /*
@@ -779,7 +787,7 @@ public class LoanAccountData {
                 loanCollateralOptions, calendarOptions, acc.syncDisbursementWithMeeting, acc.loanCounter, acc.loanProductCounter, notes,
                 accountLinkingOptions, linkedAccount, disbursementDetails, acc.multiDisburseLoan, acc.fixedEmiAmount,
                 acc.maxOutstandingLoanBalance, emiAmountVariations, acc.memberVariations, acc.product, acc.inArrears,
-                acc.graceOnArrearsAgeing, overdueCharges);
+                acc.graceOnArrearsAgeing, overdueCharges, acc.codeId);
     }
 
     public static LoanAccountData associationsAndTemplate(final LoanAccountData acc, final Collection<LoanProductData> productOptions,
@@ -809,7 +817,8 @@ public class LoanAccountData {
                 acc.chargeOptions, null, acc.loanOfficerOptions, acc.loanPurposeOptions, acc.loanCollateralOptions, acc.calendarOptions,
                 acc.syncDisbursementWithMeeting, acc.loanCounter, acc.loanProductCounter, acc.notes, acc.accountLinkingOptions,
                 acc.linkedAccount, acc.disbursementDetails, acc.multiDisburseLoan, acc.fixedEmiAmount, acc.maxOutstandingLoanBalance,
-                acc.emiAmountVariations, acc.memberVariations, acc.product, acc.inArrears, acc.graceOnArrearsAgeing, acc.overdueCharges);
+                acc.emiAmountVariations, acc.memberVariations, acc.product, acc.inArrears, acc.graceOnArrearsAgeing, acc.overdueCharges,
+                acc.codeId);
     }
 
     public static LoanAccountData associateMemberVariations(final LoanAccountData acc, final Map<Long, Integer> memberLoanCycle) {
@@ -865,7 +874,7 @@ public class LoanAccountData {
                 acc.chargeOptions, null, acc.loanOfficerOptions, acc.loanPurposeOptions, acc.loanCollateralOptions, acc.calendarOptions,
                 acc.syncDisbursementWithMeeting, acc.loanCounter, acc.loanProductCounter, acc.notes, acc.accountLinkingOptions,
                 acc.linkedAccount, acc.disbursementDetails, acc.multiDisburseLoan, acc.fixedEmiAmount, acc.maxOutstandingLoanBalance,
-                acc.emiAmountVariations, memberVariations, acc.product, acc.inArrears, acc.graceOnArrearsAgeing, acc.overdueCharges);
+                acc.emiAmountVariations, memberVariations, acc.product, acc.inArrears, acc.graceOnArrearsAgeing, acc.overdueCharges, acc.codeId);
     }
 
     private LoanAccountData(
@@ -919,7 +928,7 @@ public class LoanAccountData {
             final Boolean multiDisburseLoan, BigDecimal fixedEmiAmount, final BigDecimal maxOutstandingLoanBalance,
             final Collection<LoanTermVariationsData> emiAmountVariations, final Map<Long, LoanBorrowerCycleData> memberVariations,
             final LoanProductData product, final Boolean inArrears, final Integer graceOnArrearsAgeing,
-            final Collection<ChargeData> overdueCharges) {
+            final Collection<ChargeData> overdueCharges, final Long codeId) {
         this.id = id;
         this.accountNo = accountNo;
         this.status = status;
@@ -933,6 +942,7 @@ public class LoanAccountData {
         this.loanProductName = loanProductName;
         this.loanProductDescription = loanProductDescription;
         this.fundId = fundId;
+        this.codeId = codeId;
         this.fundName = fundName;
         this.loanPurposeId = loanPurposeId;
         this.loanPurposeName = loanPurposeName;
@@ -1095,7 +1105,11 @@ public class LoanAccountData {
     public Long clientId() {
         return this.clientId;
     }
-
+    
+    public Long codeId() {
+        return this.codeId;
+    }
+    
     private static BigDecimal fetchLoanCycleDefaultValue(Collection<LoanProductBorrowerCycleVariationData> borrowerCycleVariationData,
             Integer loanCycleNumber) {
         BigDecimal defaultValue = null;
