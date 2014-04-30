@@ -37,7 +37,6 @@ import org.mifosplatform.organisation.monetary.domain.MonetaryCurrency;
 import org.mifosplatform.organisation.monetary.domain.Money;
 import org.mifosplatform.portfolio.common.domain.PeriodFrequencyType;
 import org.mifosplatform.portfolio.fund.domain.Fund;
-import org.mifosplatform.portfolio.loanaccount.domain.LoanCharge;
 import org.mifosplatform.portfolio.loanaccount.loanschedule.domain.AprCalculator;
 import org.mifosplatform.portfolio.loanproduct.LoanProductConstants;
 import org.mifosplatform.portfolio.loanproduct.command.ProductLoanChargeCommand;
@@ -466,23 +465,25 @@ public class LoanProduct extends AbstractPersistable<Long> {
         return this.loanProductRelatedDetail.hasCurrencyCodeOf(currencyCode);
     }
 
-    public boolean update(final List<ProductLoanCharge> newProductCharges) {
-        if (newProductCharges == null) { return false; }
-
-        boolean updated = false;
-        if (this.charges != null) {
-            final Set<ProductLoanCharge> currentSetOfCharges = new HashSet<ProductLoanCharge>(this.charges);
-            final Set<ProductLoanCharge> newSetOfCharges = new HashSet<ProductLoanCharge>(newProductCharges);
-
-            if (!currentSetOfCharges.equals(newSetOfCharges)) {
-                updated = true;
-                this.charges = associateChargesWithThisLoanProduct(new HashSet<ProductLoanCharge>(newProductCharges));
+    public void update(final Set<ProductLoanCharge> prodctLoanCharges) {
+        List<Long> existingCharges = fetchAllProductLoanChargeIds();
+        
+        /** Process new and updated charges **/
+        for (final ProductLoanCharge productLoanCharge : prodctLoanCharges) {
+            ProductLoanCharge productCharge = productLoanCharge;
+            
+         // add new charges
+            if (productLoanCharge.getId() == null) {
+                productLoanCharge.update(this);
+                this.charges.add(productLoanCharge);
+            } else {
+                productCharge = fetchProductLoanChargeById(productCharge.getId());
+                existingCharges.remove(productCharge.getId());
             }
-        } else {
-            updated = true;
-            this.charges = associateChargesWithThisLoanProduct(new HashSet<ProductLoanCharge>(newProductCharges));;
+            
+            productCharge.update(productLoanCharge.isMandatory());
         }
-        return updated;
+        
     }
 
     public Integer getAccountingType() {
@@ -864,4 +865,24 @@ public class LoanProduct extends AbstractPersistable<Long> {
 
         return existingLoanCharges;
     }
+    
+    private List<Long> fetchAllProductLoanChargeIds() {
+        List<Long> list = new ArrayList<Long>();
+        for (ProductLoanCharge productLoanCharge : this.charges) {
+            list.add(productLoanCharge.getId());
+        }
+        return list;
+    }
+    
+    public ProductLoanCharge fetchProductLoanChargeById(Long id) {
+        ProductLoanCharge charge = null;
+        for (ProductLoanCharge productLoanCharge : this.charges) {
+            if (id.equals(productLoanCharge.getId())) {
+                charge = productLoanCharge;
+                break;
+            }
+        }
+        return charge;
+    }
+
 }

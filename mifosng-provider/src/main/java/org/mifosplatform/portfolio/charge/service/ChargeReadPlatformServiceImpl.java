@@ -184,7 +184,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         }
 
         public String loanProductChargeSchema() {
-            return "plc.is_mandatory as isMandatory, "+chargeSchema() + " join m_product_loan_charge plc on plc.charge_id = c.id";
+            return "plc.id as productChargeId, plc.is_mandatory as isMandatory, "+chargeSchema() + " join m_product_loan_charge plc on plc.charge_id = c.id";
         }
 
         public String savingsProductChargeSchema() {
@@ -249,8 +249,14 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                 isMandatory = rs.getBoolean("isMandatory");
             }
             
+            Long productChargeId = null;
+            if (columnNames.contains("productChargeId")) {
+                productChargeId = rs.getLong("productChargeId");
+            }
+            
             return ChargeData.instance(id, name, amount, currency, chargeTimeType, chargeAppliesToType, chargeCalculationType,
-                    chargePaymentMode, feeOnMonthDay, feeInterval, penalty, active, minCap, maxCap, feeFrequencyType, isMandatory);
+                    chargePaymentMode, feeOnMonthDay, feeInterval, penalty, active, minCap, maxCap, feeFrequencyType,
+                    isMandatory, productChargeId);
         }
     }
 

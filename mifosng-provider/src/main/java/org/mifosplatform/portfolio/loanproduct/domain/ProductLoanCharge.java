@@ -75,4 +75,8 @@ public class ProductLoanCharge extends AbstractPersistable<Long> {
     public ProductLoanChargeCommand toCommand() {
         return new ProductLoanChargeCommand(getId(), this.charge.getId(), this.isMandatory);
     }
+    
+    public void update(Boolean isMandatory) {
+        this.isMandatory = isMandatory;
+    }
 }

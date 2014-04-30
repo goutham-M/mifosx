@@ -39,6 +39,7 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
     private final BigDecimal maxCap;
     private final EnumOptionData feeFrequency;
     private final boolean isMandatory;
+    private final Long productChargeId;
 
     private final Collection<CurrencyData> currencyOptions;
     private final List<EnumOptionData> chargeCalculationTypeOptions;//
@@ -62,7 +63,7 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
         return new ChargeData(null, null, null, null, null, null, null, null, false, false, currencyOptions, chargeCalculationTypeOptions,
                 chargeAppliesToOptions, chargeTimeTypeOptions, chargePaymentModeOptions, loansChargeCalculationTypeOptions,
                 loansChargeTimeTypeOptions, savingsChargeCalculationTypeOptions, savingsChargeTimeTypeOptions, null, null, null, null,
-                null, feeFrequencyOptions, false);
+                null, feeFrequencyOptions, false, null);
     }
 
     public static ChargeData withTemplate(final ChargeData charge, final ChargeData template) {
@@ -71,13 +72,15 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
                 template.chargeCalculationTypeOptions, template.chargeAppliesToOptions, template.chargeTimeTypeOptions,
                 template.chargePaymetModeOptions, template.loanChargeCalculationTypeOptions, template.loanChargeTimeTypeOptions,
                 template.savingsChargeCalculationTypeOptions, template.savingsChargeTimeTypeOptions, charge.feeOnMonthDay,
-                charge.feeInterval, charge.minCap, charge.maxCap, charge.feeFrequency, template.feeFrequencyOptions, template.isMandatory);
+                charge.feeInterval, charge.minCap, charge.maxCap, charge.feeFrequency, template.feeFrequencyOptions,
+                template.isMandatory, template.productChargeId);
     }
 
     public static ChargeData instance(final Long id, final String name, final BigDecimal amount, final CurrencyData currency,
             final EnumOptionData chargeTimeType, final EnumOptionData chargeAppliesTo, final EnumOptionData chargeCalculationType,
             final EnumOptionData chargePaymentMode, final MonthDay feeOnMonthDay, final Integer feeInterval, final boolean penalty,
-            final boolean active, final BigDecimal minCap, final BigDecimal maxCap, final EnumOptionData feeFrequency, final boolean isMandatory) {
+            final boolean active, final BigDecimal minCap, final BigDecimal maxCap, final EnumOptionData feeFrequency,
+            final boolean isMandatory, final Long productChargeId) {
 
         final Collection<CurrencyData> currencyOptions = null;
         final List<EnumOptionData> chargeCalculationTypeOptions = null;
@@ -94,7 +97,7 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
                 penalty, active, currencyOptions, chargeCalculationTypeOptions, chargeAppliesToOptions, chargeTimeTypeOptions,
                 chargePaymentModeOptions, loansChargeCalculationTypeOptions, loansChargeTimeTypeOptions,
                 savingsChargeCalculationTypeOptions, savingsChargeTimeTypeOptions, feeOnMonthDay, feeInterval, minCap, maxCap,
-                feeFrequency, feeFrequencyOptions, isMandatory);
+                feeFrequency, feeFrequencyOptions, isMandatory, productChargeId);
     }
 
     public static ChargeData lookup(final Long id, final String name, final boolean isPenalty) {
@@ -122,12 +125,13 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
         final EnumOptionData feeFrequency = null;
         final List<EnumOptionData> feeFrequencyOptions = null;
         final Boolean isMandatory = false;
+        final Long productChargeId = null;
 
         return new ChargeData(id, name, amount, currency, chargeTimeType, chargeAppliesTo, chargeCalculationType, chargePaymentMode,
                 penalty, active, currencyOptions, chargeCalculationTypeOptions, chargeAppliesToOptions, chargeTimeTypeOptions,
                 chargePaymentModeOptions, loansChargeCalculationTypeOptions, loansChargeTimeTypeOptions,
                 savingsChargeCalculationTypeOptions, savingsChargeTimeTypeOptions, feeOnMonthDay, feeInterval, minCap, maxCap,
-                feeFrequency, feeFrequencyOptions, isMandatory);
+                feeFrequency, feeFrequencyOptions, isMandatory, productChargeId);
     }
 
     private ChargeData(final Long id, final String name, final BigDecimal amount, final CurrencyData currency,
@@ -139,7 +143,7 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
             final List<EnumOptionData> loansChargeTimeTypeOptions, final List<EnumOptionData> savingsChargeCalculationTypeOptions,
             final List<EnumOptionData> savingsChargeTimeTypeOptions, final MonthDay feeOnMonthDay, final Integer feeInterval,
             final BigDecimal minCap, final BigDecimal maxCap, final EnumOptionData feeFrequency,
-            final List<EnumOptionData> feeFrequencyOptions, final boolean isMandatory) {
+            final List<EnumOptionData> feeFrequencyOptions, final boolean isMandatory, final Long productChargeId) {
         this.id = id;
         this.name = name;
         this.amount = amount;
@@ -166,6 +170,7 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
         this.feeFrequency = feeFrequency;
         this.feeFrequencyOptions = feeFrequencyOptions;
         this.isMandatory = isMandatory;
+        this.productChargeId = productChargeId;
     }
 
     @Override
