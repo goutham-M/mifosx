@@ -188,6 +188,7 @@ public class LoansApiResource {
         // template
         final Collection<LoanProductData> productOptions = this.loanProductReadPlatformService.retrieveAllLoanProductsForLookup();
 
+        final Collection<CodeValueData> fundTypeOptions = this.codeValueReadPlatformService.retrieveCodeValuesByCode("fundType");
         // options
         Collection<StaffData> allowedLoanOfficers = null;
         Collection<CodeValueData> loanCollateralOptions = null;
@@ -271,7 +272,7 @@ public class LoansApiResource {
             // add product options, allowed loan officers and calendar options
             // (calendar options will be null in individual loan)
             newLoanAccount = LoanAccountData.associationsAndTemplate(newLoanAccount, productOptions, allowedLoanOfficers, calendarOptions,
-                    accountLinkingOptions);
+                    accountLinkingOptions, fundTypeOptions);
         }
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, newLoanAccount, this.LOAN_DATA_PARAMETERS);
@@ -288,7 +289,8 @@ public class LoansApiResource {
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
 
         final LoanAccountData loanBasicDetails = this.loanReadPlatformService.retrieveOne(loanId);
-
+        final Collection<CodeValueData> fundTypeOptions = this.codeValueReadPlatformService.retrieveCodeValuesByCode("fundType");
+        
         Collection<LoanTransactionData> loanRepayments = null;
         LoanScheduleData repaymentSchedule = null;
         Collection<LoanChargeData> charges = null;
@@ -417,7 +419,7 @@ public class LoansApiResource {
             allowedLoanOfficers = this.loanReadPlatformService.retrieveAllowedLoanOfficers(loanBasicDetails.officeId(),
                     staffInSelectedOfficeOnly);
 
-            loanPurposeOptions = this.codeValueReadPlatformService.retrieveCodeValuesByCode("LoanPurpose");
+            loanPurposeOptions = this.codeValueReadPlatformService.retrieveAllCodeValues(loanBasicDetails.codeId());
             loanCollateralOptions = this.codeValueReadPlatformService.retrieveCodeValuesByCode("LoanCollateral");
             final CurrencyData currencyData = loanBasicDetails.currency();
             String currencyCode = null;
@@ -442,7 +444,8 @@ public class LoansApiResource {
                 charges, collateral, guarantors, meeting, productOptions, loanTermFrequencyTypeOptions, repaymentFrequencyTypeOptions,
                 repaymentStrategyOptions, interestRateFrequencyTypeOptions, amortizationTypeOptions, interestTypeOptions,
                 interestCalculationPeriodTypeOptions, fundOptions, chargeOptions, chargeTemplate, allowedLoanOfficers, loanPurposeOptions,
-                loanCollateralOptions, calendarOptions, notes, accountLinkingOptions, linkedAccount, disbursementData, emiAmountVariations);
+                loanCollateralOptions, calendarOptions, notes, accountLinkingOptions, linkedAccount, disbursementData,emiAmountVariations,
+                fundTypeOptions);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters(),
                 mandatoryResponseParameters);
@@ -503,6 +506,20 @@ public class LoansApiResource {
 
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateLoanApplication(loanId).withJson(apiRequestBodyAsJson)
                 .build();
+
+        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+        return this.toApiJsonSerializer.serialize(result);
+    }
+    
+    @PUT
+    @Path("fundmapping")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String modifyLoanApplicationForFundMapping(final String apiRequestBodyAsJson) {
+
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateLoanApplicationForFundMapping()
+                .withJson(apiRequestBodyAsJson).build();
 
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 

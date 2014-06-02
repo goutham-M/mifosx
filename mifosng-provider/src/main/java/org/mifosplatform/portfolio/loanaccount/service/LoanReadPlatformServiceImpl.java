@@ -416,9 +416,9 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
     private static final class LoanMapper implements RowMapper<LoanAccountData> {
 
         public String loanSchema() {
-            return "l.id as id, l.account_no as accountNo, l.external_id as externalId, l.fund_id as fundId, f.name as fundName,"
-                    + " l.loan_type_enum as loanType, l.loanpurpose_cv_id as loanPurposeId, cv.code_value as loanPurposeName,"
-                    + " lp.id as loanProductId, lp.name as loanProductName, lp.description as loanProductDescription,"
+            return "l.id as id, l.account_no as accountNo, l.external_id as externalId, l.fund_id as fundId, l.fund_type_cv_id as fundTypeId, l.funding_date as fundingDate, f.name as fundName,"
+                    + " cfv.code_value as fundTypeValue, l.loan_type_enum as loanType, l.loanpurpose_cv_id as loanPurposeId, cv.code_value as loanPurposeName,"
+                    + " lp.id as loanProductId, lp.name as loanProductName, lp.description as loanProductDescription, lp.purpose_category_code_id as codeId, "
                     + " lp.allow_multiple_disbursals as multiDisburseLoan,"
                     + " c.id as clientId, c.display_name as clientName, c.office_id as clientOfficeId,"
                     + " g.id as groupId, g.display_name as groupName,"
@@ -487,6 +487,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     + " left join m_group g on g.id = l.group_id" //
                     + " left join m_loan_arrears_aging la on la.loan_id = l.id" //
                     + " left join m_fund f on f.id = l.fund_id" //
+                    + " left join m_code_value cfv on cfv.id = l.fund_type_cv_id"
                     + " left join m_staff s on s.id = l.loan_officer_id" //
                     + " left join m_appuser sbu on sbu.id = l.submittedon_userid"
                     + " left join m_appuser rbu on rbu.id = l.rejectedon_userid"
@@ -531,7 +532,11 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
             final Long fundId = JdbcSupport.getLong(rs, "fundId");
             final String fundName = rs.getString("fundName");
-
+            
+            final Long fundTypeId = JdbcSupport.getLong(rs, "fundTypeId");
+            final String fundTypeValue = rs.getString("fundTypeValue");
+            final LocalDate fundingDate = JdbcSupport.getLocalDate(rs, "fundingDate");
+            
             final Long loanOfficerId = JdbcSupport.getLong(rs, "loanOfficerId");
             final String loanOfficerName = rs.getString("loanOfficerName");
 
@@ -541,6 +546,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             final Long loanProductId = JdbcSupport.getLong(rs, "loanProductId");
             final String loanProductName = rs.getString("loanProductName");
             final String loanProductDescription = rs.getString("loanProductDescription");
+            final Long codeId = JdbcSupport.getLong(rs, "codeId");
             final Boolean multiDisburseLoan = rs.getBoolean("multiDisburseLoan");
             final BigDecimal outstandingLoanBalance = rs.getBigDecimal("outstandingLoanBalance");
 
@@ -710,7 +716,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     annualInterestRate, interestType, interestCalculationPeriodType, expectedFirstRepaymentOnDate, graceOnPrincipalPayment,
                     graceOnInterestPayment, graceOnInterestCharged, interestChargedFromDate, timeline, loanSummary,
                     feeChargesDueAtDisbursementCharged, syncDisbursementWithMeeting, loanCounter, loanProductCounter, multiDisburseLoan,
-                    fixedEmiAmount, outstandingLoanBalance, inArrears, graceOnArrearsAgeing);
+                    fixedEmiAmount, outstandingLoanBalance, inArrears, graceOnArrearsAgeing, fundTypeId, fundingDate, fundTypeValue, codeId);
         }
     }
 
@@ -1111,7 +1117,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         final Collection<FundData> fundOptions = this.fundReadPlatformService.retrieveAllFunds();
         final Collection<TransactionProcessingStrategyData> repaymentStrategyOptions = this.loanDropdownReadPlatformService
                 .retreiveTransactionProcessingStrategies();
-        final Collection<CodeValueData> loanPurposeOptions = this.codeValueReadPlatformService.retrieveCodeValuesByCode("LoanPurpose");
+        final Collection<CodeValueData> loanPurposeOptions = this.codeValueReadPlatformService.retrieveAllCodeValues(loanProduct.getCodeId());
         final Collection<CodeValueData> loanCollateralOptions = this.codeValueReadPlatformService
                 .retrieveCodeValuesByCode("LoanCollateral");
         final boolean feeChargesOnly = false;

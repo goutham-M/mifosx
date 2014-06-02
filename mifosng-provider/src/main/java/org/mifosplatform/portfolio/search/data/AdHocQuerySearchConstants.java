@@ -33,7 +33,7 @@ public interface AdHocQuerySearchConstants {
             includeOutStandingAmountPercentageParamName, outStandingAmountPercentageConditionParamName,
             minOutStandingAmountPercentageParamName, maxOutStandingAmountPercentageParamName, outStandingAmountPercentageParamName,
             includeOutstandingAmountParamName, outstandingAmountConditionParamName, minOutstandingAmountParamName,
-            maxOutstandingAmountParamName, outstandingAmountParamName, localeParamName, dateFormatParamName));
+            maxOutstandingAmountParamName, outstandingAmountParamName, localeParamName, dateFormatParamName, entitiesParamName));
 
     public static final Set<String> AD_HOC_SEARCH_QUERY_CONDITIONS = new HashSet<String>(
             Arrays.asList("between", "<=", ">=", "<", ">", "="));

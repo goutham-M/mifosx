@@ -121,7 +121,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     + "lp.amortization_method_enum as amortizationMethod, lp.arrearstolerance_amount as tolerance, "
                     + "lp.accounting_type as accountingType, lp.include_in_borrower_cycle as includeInBorrowerCycle,lp.use_borrower_cycle as useBorrowerCycle, lp.start_date as startDate, lp.close_date as closeDate,  "
                     + "lp.allow_multiple_disbursals as multiDisburseLoan, lp.max_disbursals as maxTrancheCount, lp.max_outstanding_loan_balance as outstandingLoanBalance, "
-                    + "curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, curr.display_symbol as currencyDisplaySymbol, lp.external_id as externalId "
+                    + "curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, curr.display_symbol as currencyDisplaySymbol, lp.external_id as externalId, lp.purpose_category_code_id as codeId  "
                     + " from m_product_loan lp "
                     + " left join m_fund f on f.id = lp.fund_id"
                     + " left join ref_loan_transaction_processing_strategy ltps on ltps.id = lp.loan_transaction_strategy_id"
@@ -200,6 +200,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                 status = "loanProduct.active";
             }
             final String externalId = rs.getString("externalId");
+            final Long codeId = JdbcSupport.getLong(rs, "codeId");
             final Collection<LoanProductBorrowerCycleVariationData> principalVariationsForBorrowerCycle = new ArrayList<LoanProductBorrowerCycleVariationData>();
             final Collection<LoanProductBorrowerCycleVariationData> interestRateVariationsForBorrowerCycle = new ArrayList<LoanProductBorrowerCycleVariationData>();
             final Collection<LoanProductBorrowerCycleVariationData> numberOfRepaymentVariationsForBorrowerCycle = new ArrayList<LoanProductBorrowerCycleVariationData>();
@@ -227,7 +228,8 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     transactionStrategyId, transactionStrategyName, graceOnPrincipalPayment, graceOnInterestPayment,
                     graceOnInterestCharged, this.charges, accountingRuleType, includeInBorrowerCycle, useBorrowerCycle, startDate,
                     closeDate, status, externalId, principalVariationsForBorrowerCycle, interestRateVariationsForBorrowerCycle,
-                    numberOfRepaymentVariationsForBorrowerCycle, multiDisburseLoan, maxTrancheCount, outstandingLoanBalance, graceOnArrearsAgeing);
+                    numberOfRepaymentVariationsForBorrowerCycle, multiDisburseLoan, maxTrancheCount, outstandingLoanBalance, graceOnArrearsAgeing,
+                    codeId);
         }
 
     }

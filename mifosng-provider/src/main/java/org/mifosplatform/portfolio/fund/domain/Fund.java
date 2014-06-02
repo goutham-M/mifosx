@@ -27,7 +27,7 @@ public class Fund extends AbstractPersistable<Long> {
 
     @Column(name = "external_id", length = 100)
     private String externalId;
-
+    
     public static Fund fromJson(final JsonCommand command) {
 
         final String firstnameParamName = "name";
@@ -65,7 +65,7 @@ public class Fund extends AbstractPersistable<Long> {
             actualChanges.put(externalIdParamName, newValue);
             this.externalId = StringUtils.defaultIfEmpty(newValue, null);
         }
-
+        
         return actualChanges;
     }
 }

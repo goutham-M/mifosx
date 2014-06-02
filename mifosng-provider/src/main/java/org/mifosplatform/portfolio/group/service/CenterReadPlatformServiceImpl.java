@@ -523,7 +523,7 @@ public class CenterReadPlatformServiceImpl implements CenterReadPlatformService 
                 } else {
                     for (StaffCenterData staffCenterData : staffCenterDataArray) {
                         flag = false;
-                        if (staffCenterData.getStaffId() == centerData.staffId()) {
+                        if (staffCenterData.getStaffId().equals(centerData.staffId())) {
                             staffCenterData.getMeetingFallCenters().add(centerData);
                             flag = true;
                             break;

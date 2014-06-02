@@ -57,9 +57,10 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             "collateral", // optional
             "transactionProcessingStrategyId", // settings
             "calendarId", // optional
-            "syncDisbursementWithMeeting",// optional
+            "syncDisbursementWithMeeting", "fundTypeId", "fundingDate",// optional
             "linkAccountId", LoanApiConstants.disbursementDataParameterName, LoanApiConstants.emiAmountParameterName,
             LoanApiConstants.maxOutstandingBalanceParameterName, LoanProductConstants.graceOnArrearsAgeingParameterName));
+
 
     private final FromJsonHelper fromApiJsonHelper;
     private final CalculateLoanScheduleQueryFromApiJsonHelper apiJsonHelper;
@@ -129,7 +130,27 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             final Long fundId = this.fromApiJsonHelper.extractLongNamed(fundIdParameterName, element);
             baseDataValidator.reset().parameter(fundIdParameterName).value(fundId).ignoreIfNull().integerGreaterThanZero();
         }
-
+        
+        final String fundTypeIdParameterName = "fundTypeId";
+        if (this.fromApiJsonHelper.parameterExists(fundTypeIdParameterName, element)) {
+            final Long fundTypeId = this.fromApiJsonHelper.extractLongNamed(fundTypeIdParameterName, element);
+            baseDataValidator.reset().parameter(fundTypeIdParameterName).value(fundTypeId).ignoreIfNull().integerGreaterThanZero();
+            if (!this.fromApiJsonHelper.parameterExists(fundIdParameterName, element)) {
+                final ApiParameterError error = ApiParameterError.parameterError(
+                        "validation.msg.loan.fund.must.be.entered.when.using.fundType.field",
+                        "The parameter fundId cannot be empty when fundTypeId is provided.",
+                        "fundId", fundTypeId);
+                dataValidationErrors.add(error);
+            }
+        }
+        
+        final String fundingDateDateParameterName = "fundingDate";
+        if (this.fromApiJsonHelper.parameterExists(fundingDateDateParameterName, element)) {
+            final LocalDate fundingDate = this.fromApiJsonHelper.extractLocalDateNamed(fundingDateDateParameterName,
+                    element);
+            baseDataValidator.reset().parameter(fundingDateDateParameterName).value(fundingDate).ignoreIfNull();
+        }
+        
         final String loanOfficerIdParameterName = "loanOfficerId";
         if (this.fromApiJsonHelper.parameterExists(loanOfficerIdParameterName, element)) {
             final Long loanOfficerId = this.fromApiJsonHelper.extractLongNamed(loanOfficerIdParameterName, element);
@@ -410,6 +431,26 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             atLeastOneParameterPassedForUpdate = true;
             final Long fundId = this.fromApiJsonHelper.extractLongNamed(fundIdParameterName, element);
             baseDataValidator.reset().parameter(fundIdParameterName).value(fundId).ignoreIfNull().integerGreaterThanZero();
+            final String fundTypeIdParameterName = "fundTypeId";
+            if (this.fromApiJsonHelper.parameterExists(fundTypeIdParameterName, element)) {
+                final Long fundTypeId = this.fromApiJsonHelper.extractLongNamed(fundTypeIdParameterName, element);
+                baseDataValidator.reset().parameter(fundTypeIdParameterName).value(fundTypeId).ignoreIfNull().integerGreaterThanZero();
+                if (fundId == null && fundTypeId != null) {
+                    final ApiParameterError error = ApiParameterError.parameterError(
+                            "validation.msg.loan.fund.must.be.entered.when.using.fundType.field",
+                            "The parameter fundId cannot be empty when fundTypeId is provided.",
+                            "fundId", fundTypeId);
+                    dataValidationErrors.add(error);
+                }
+            }
+        }
+        
+        final String fundingDateDateParameterName = "fundingDate";
+        if (this.fromApiJsonHelper.parameterExists(fundingDateDateParameterName, element)) {
+            atLeastOneParameterPassedForUpdate = true;
+            final LocalDate fundingDate = this.fromApiJsonHelper.extractLocalDateNamed(fundingDateDateParameterName,
+                    element);
+            baseDataValidator.reset().parameter(fundingDateDateParameterName).value(fundingDate).ignoreIfNull();
         }
 
         final String loanOfficerIdParameterName = "loanOfficerId";
@@ -771,6 +812,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
 
     private void validateLoanMultiDisbursementdate(final JsonElement element, final DataValidatorBuilder baseDataValidator,
             LocalDate expectedDisbursement, BigDecimal totalPrincipal) {
+
         final JsonObject topLevelJsonElement = element.getAsJsonObject();
         final Locale locale = this.fromApiJsonHelper.extractLocaleParameter(topLevelJsonElement);
         final String dateFormat = this.fromApiJsonHelper.extractDateFormatParameter(topLevelJsonElement);
@@ -825,7 +867,44 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             }
 
         }
+            
+    }
 
+    public void validateForFundMapping(final String json) {
+        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+
+        final Set<String> undoSupportedParameters = new HashSet<String>(Arrays.asList("fundId", "loanIdArray", "fundTypeId", "fundingDate", "locale", "dateFormat"));
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, undoSupportedParameters);
+
+        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan");
+        final JsonElement element = this.fromApiJsonHelper.parse(json);
+
+        final String fundIdParam = "fundId";
+        final Long fundId = this.fromApiJsonHelper.extractLongNamed(fundIdParam, element);
+        baseDataValidator.reset().parameter(fundIdParam).value(fundId).notNull();
+        
+        final String fundTypeIdParam = "fundTypeId";
+        if (this.fromApiJsonHelper.parameterExists(fundTypeIdParam, element)) {
+            final Long fundTypeId = this.fromApiJsonHelper.extractLongNamed(fundTypeIdParam, element);
+            baseDataValidator.reset().parameter(fundTypeIdParam).value(fundTypeId).notNull();
+        }
+        
+        final String fundingDateDateParameterName = "fundingDate";
+        if (this.fromApiJsonHelper.parameterExists(fundingDateDateParameterName, element)) {
+            final LocalDate fundingDate = this.fromApiJsonHelper.extractLocalDateNamed(fundingDateDateParameterName,
+                    element);
+            baseDataValidator.reset().parameter(fundingDateDateParameterName).value(fundingDate).ignoreIfNull();
+        }
+        
+        final String loanIdArrayParam = "loanIdArray";
+        if (this.fromApiJsonHelper.parameterExists(loanIdArrayParam, element)) {
+            final String[] loanIdArray = this.fromApiJsonHelper.extractArrayNamed(loanIdArrayParam, element);
+            baseDataValidator.reset().parameter(loanIdArrayParam).value(loanIdArray).arrayNotEmpty();
+        }
+
+        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
     }
 
 }
